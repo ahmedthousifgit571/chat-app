@@ -52,6 +52,57 @@ export const signUp = async (req, res) => {
   }
 };
 
-export const logIn = (req, res) => {};
+export const logIn = async(req, res) => {
+  const {password,email} = req.body
+  try {
+    const user = await User.findOne({email})
+    if(!user){
+      return res.status(400).json({
+        statusCode:400,
+        message:"invalid credentials"
+      })
+    }
+    const isPasswordCorrect = await bcrypt.compare(password,user.password)
+    if(!isPasswordCorrect){
+      return res.status(400).json({
+        statusCode:400,
+        message:"invalid credentials"
+      })
+    }
+    generateToken(user._id,res)
+    return res.status(200).json({
+      message:"login successfully",
+      _id:user._id,
+      fullName:user.fullName,
+      email:user.email,
+      profilePic:user.profilePic
+    })
+  } catch (error) {
+    console.log("error in signup controller", error.message);
+    res.status(500).json({
+      statusCode: 500,
+      message: "internal server error",
+    });
+  }
+};
 
-export const logout = (req, res) => {};
+export const logout = async(req, res) => {
+  try {
+    res.cookie("jwt","",{maxAge:0})
+    res.status(200).json({message:"Logged out successfully"})
+  } catch (error) {
+    console.log("error in signup controller", error.message);
+    res.status(500).json({
+      statusCode: 500,
+      message: "internal server error",
+    });
+  }
+};
+
+export const updateProfile = async(req,res)=>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
